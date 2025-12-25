@@ -1,15 +1,15 @@
-import { Hono } from 'hono'
+import dotenv from 'dotenv';
+import { client } from './bot/client';
 
-const app = new Hono()
+dotenv.config();
 
-app.get('/', (c) => {
-  return c.text('Hello Hono!')
-})
+const token = process.env.DISCORD_TOKEN;
 
-app.get("/test", (c) => {
-  return c.json({
-    message : "wasuchoks"
-  })
-})
+if (!token) {
+  console.error('ERROR: DISCORD_TOKEN is not defined in .env');
+  process.exit(1);
+}
 
-export default app
+client.login(token).catch(err => {
+  console.error('Failed to login to Discord:', err);
+});
