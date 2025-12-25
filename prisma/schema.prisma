@@ -8,30 +8,32 @@ generator client {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  discordId String   @unique
-  createdAt DateTime @default(now())
+  id           String        @id @default(uuid())
+  discordId    String        @unique
+  createdAt    DateTime      @default(now())
   transactions Transaction[]
 }
 
 model Category {
-  id        String   @id @default(uuid())
-  name      String
-  type      TransactionType
-  createdAt DateTime @default(now())
+  id           String          @id @default(uuid())
+  name         String
+  type         TransactionType
+  createdAt    DateTime        @default(now())
   transactions Transaction[]
+
+  @@unique([name, type])
 }
 
 model Transaction {
-  id         String   @id @default(uuid())
+  id         String          @id @default(uuid())
   userId     String
   categoryId String
-  amount     Decimal  @db.Decimal(12, 2)
+  amount     Decimal         @db.Decimal(12, 2)
   type       TransactionType
   note       String?
-  occurredAt DateTime @db.Timestamptz
+  occurredAt DateTime        @db.Timestamptz
   source     String
-  createdAt DateTime @default(now())
+  createdAt  DateTime        @default(now())
 
   user     User     @relation(fields: [userId], references: [id])
   category Category @relation(fields: [categoryId], references: [id])

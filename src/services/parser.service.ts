@@ -26,19 +26,7 @@ function tryRuleBased(text: string): OpenAIResponse | null {
     return createAddTransaction(parseFloat(amountCurrency[1]), 'expense', 'ทั่วไป');
   }
 
-  // 3. Common Thai patterns: "ค่าข้าว 50", "ค่าน้ำมัน 500", "ซื้อของ 120"
-  // Pattern: (ค่า|ซื้อ|จ่าย)(หมวดหมู่) (จำนวน)
-  const thaiPattern = /^(ค่า|ซื้อ|จ่าย|รับ|ได้เงิน|เงินเดือน)\s*([^\s\d]+)\s*(\d+(\.\d+)?)$/.exec(input);
-  if (thaiPattern) {
-    const prefix = thaiPattern[1];
-    const category = thaiPattern[2];
-    const amount = parseFloat(thaiPattern[3]);
-    const type = (prefix === 'รับ' || prefix === 'ได้เงิน' || prefix === 'เงินเดือน') ? 'income' : 'expense';
-
-    return createAddTransaction(amount, type, category);
-  }
-
-  // 4. Summary keywords
+  // 3. Summary keywords
   if (['วันนี้', 'สรุปวันนี้', 'วันนี้ใช้ไปเท่าไหร่'].includes(input)) {
     return createQuerySummary('today');
   }
@@ -53,6 +41,7 @@ function createAddTransaction(amount: number, type: 'income' | 'expense', catego
   return {
     intent: 'add_transaction',
     confidence: 0.95,
+    reply: `ข้าบันทึกรายการให้ท่านเรียบร้อยแล้วขอรับ`,
     transactions: [{
       amount,
       type,
@@ -69,6 +58,7 @@ function createQuerySummary(range: 'today' | 'month'): OpenAIResponse {
   return {
     intent: 'query_summary',
     confidence: 1.0,
+    reply: `ข้าตรวจตราสมุดบัญชีของท่านแล้ว พร้อมรายงานให้ทราบแล้วขอรับ`,
     transactions: [],
     query: { range, from: null, to: null, category: null },
     edit: { target: null, new_amount: null, new_category: null, new_note: null, new_date: null },

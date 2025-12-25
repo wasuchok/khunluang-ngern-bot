@@ -22,32 +22,23 @@ export class TransactionService {
     // 2. Find or create category
     const category = await prisma.category.upsert({
       where: {
-        // Note: Category doesn't have a unique constraint on name in the schema provided,
-        // but for MVP we'll assume name is unique per type or just find first.
-        // Let's adjust the schema logic or just find first.
-        id: 'temp-id' // This is a bit tricky without unique name.
+        name_type: {
+          name: data.categoryName,
+          type: data.type as TransactionType,
+        },
       },
       update: {},
-      create: { name: data.categoryName, type: data.type as TransactionType },
+      create: {
+        name: data.categoryName,
+        type: data.type as TransactionType,
+      },
     });
-    // Re-thinking: The schema provided doesn't have unique on Category name.
-    // I'll use a simple findFirst/create for now.
-
-    let cat = await prisma.category.findFirst({
-      where: { name: data.categoryName, type: data.type as TransactionType }
-    });
-
-    if (!cat) {
-      cat = await prisma.category.create({
-        data: { name: data.categoryName, type: data.type as TransactionType }
-      });
-    }
 
     // 3. Create transaction
     return await prisma.transaction.create({
       data: {
         userId: user.id,
-        categoryId: cat.id,
+        categoryId: category.id,
         amount: new Decimal(data.amount),
         type: data.type as TransactionType,
         note: data.note,
