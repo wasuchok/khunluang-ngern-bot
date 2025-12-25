@@ -25,15 +25,15 @@
 ข้าได้บันทึกภาพการทำงานของข้าในกล่องสนทนามาให้ท่านทัศนา:
 
 <p align="center">
-  <img src="image/1.png" width="1000" alt="บันทึกรายจ่าย">
-  <img src="image/2.png" width="1000" alt="บันทึกรายรับ">
+  <img src="image/1.png" width="800" alt="บันทึกรายจ่าย">
+  <img src="image/2.png" width="800" alt="บันทึกรายรับ">
 </p>
 <p align="center">
-  <img src="image/3.png" width="1000" alt="บันทึกหลายรายการ">
-  <img src="image/4.png" width="1000" alt="สรุปบัญชี">
+  <img src="image/3.png" width="800" alt="บันทึกหลายรายการ">
+  <img src="image/4.png" width="800" alt="สรุปบัญชี">
 </p>
 <p align="center">
-  <img src="image/5.png" width="1000" alt="การแซวของขุนหลวงเงิน">
+  <img src="image/5.png" width="800" alt="การแซวของขุนหลวงเงิน">
 </p>
 
 ---
