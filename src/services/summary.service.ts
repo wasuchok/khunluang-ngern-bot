@@ -10,14 +10,17 @@ const prisma = new PrismaClient();
 const TZ = 'Asia/Bangkok';
 
 export class SummaryService {
-  static async getSummary(discordId: string, range: 'today' | 'week' | 'month' | 'custom', from?: Date, to?: Date) {
+  static async getSummary(discordId: string, range: 'today' | 'yesterday' | 'week' | 'month' | 'custom', from?: Date, to?: Date) {
     const user = await prisma.user.findUnique({ where: { discordId } });
     if (!user) return { totalExpense: 0, totalIncome: 0, byCategory: [] };
 
     let startDate = dayjs().tz(TZ).startOf('day');
     let endDate = dayjs().tz(TZ).endOf('day');
 
-    if (range === 'week') {
+    if (range === 'yesterday') {
+      startDate = dayjs().tz(TZ).subtract(1, 'day').startOf('day');
+      endDate = dayjs().tz(TZ).subtract(1, 'day').endOf('day');
+    } else if (range === 'week') {
       startDate = dayjs().tz(TZ).startOf('week');
     } else if (range === 'month') {
       startDate = dayjs().tz(TZ).startOf('month');

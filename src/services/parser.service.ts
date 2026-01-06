@@ -1,13 +1,19 @@
 import { OpenAIResponse, parseWithAI } from './openai.service';
 
-export async function parseMessage(text: string): Promise<OpenAIResponse> {
-  // 1. Rule-based parsing (Simple cases)
+export async function parseMessage(text: string, imageUrl?: string): Promise<OpenAIResponse> {
+  // 1. If it's a slip (imageUrl provided), we handle it differently
+  if (imageUrl) {
+    // We'll handle this in the client for now to keep the parser focused on text
+    // but the parser could also be updated to take OCR text.
+  }
+
+  // 2. Rule-based parsing (Simple cases)
   const ruleBased = tryRuleBased(text);
   if (ruleBased && ruleBased.confidence > 0.9) {
     return ruleBased;
   }
 
-  // 2. OpenAI parsing
+  // 3. OpenAI parsing
   return await parseWithAI(text);
 }
 
@@ -33,6 +39,9 @@ function tryRuleBased(text: string): OpenAIResponse | null {
   if (['เดือนนี้', 'สรุปเดือนนี้'].includes(input)) {
     return createQuerySummary('month');
   }
+  if (['เมื่อวาน', 'สรุปเมื่อวาน', 'เมื่อวานนี้', 'เมื่อวานใช้ไปเท่าไหร่', 'เมื่อวานใช้ไปเท่าไร'].includes(input)) {
+    return createQuerySummary('yesterday');
+  }
 
   return null;
 }
@@ -54,7 +63,7 @@ function createAddTransaction(amount: number, type: 'income' | 'expense', catego
   };
 }
 
-function createQuerySummary(range: 'today' | 'month'): OpenAIResponse {
+function createQuerySummary(range: 'today' | 'month' | 'yesterday'): OpenAIResponse {
   return {
     intent: 'query_summary',
     confidence: 1.0,

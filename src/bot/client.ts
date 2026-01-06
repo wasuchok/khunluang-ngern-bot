@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { Client, GatewayIntentBits, Message } from 'discord.js';
 import { parseMessage } from '../services/parser.service';
+import { SlipService } from '../services/slip.service';
 import { SummaryService } from '../services/summary.service';
 import { TransactionService } from '../services/transaction.service';
 
@@ -20,7 +21,24 @@ client.on('messageCreate', async (message: Message) => {
   if (message.author.bot) return;
 
   try {
-    const text = message.content;
+    let text = message.content;
+    const attachment = message.attachments.first();
+    let slipResult = null;
+
+    if (attachment && attachment.contentType?.startsWith('image/')) {
+      if ('sendTyping' in message.channel) {
+        await message.channel.sendTyping();
+      }
+      slipResult = await SlipService.processSlip(attachment.url);
+
+      if (slipResult && slipResult.amount) {
+        text = `บันทึกรายจ่าย ${slipResult.amount} บาท จากสลิปธนาคาร`;
+        if (slipResult.isVerified) {
+          text += ` (ตรวจสอบแล้วว่าเป็นสลิปจริง รหัสอ้างอิง: ${slipResult.transRef})`;
+        }
+      }
+    }
+
     const result = await parseMessage(text);
 
     if (result.confidence < 0.6 && result.intent !== 'help') {
@@ -175,6 +193,7 @@ async function handleDeleteLast(message: Message, result: any) {
 function getRangeText(range: string) {
   switch (range) {
     case 'today': return 'วันนี้';
+    case 'yesterday': return 'เมื่อวาน';
     case 'week': return 'อาทิตย์นี้';
     case 'month': return 'เดือนนี้';
     default: return 'ช่วงที่เลือก';
